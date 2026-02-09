@@ -554,6 +554,18 @@
 		window.addEventListener('message', onMessageHandler);
 		$socket?.on('events', chatEventHandler);
 
+		// Listen for chats-deleted event from admin
+		$socket?.on('chats-deleted', async (data) => {
+			console.log('Received chats-deleted event in Chat:', data);
+			toast.info($i18n.t('All chats have been deleted by admin'));
+			// Refresh the chat list
+			await chats.set(await getChatList(localStorage.token, $currentChatPage));
+			// If currently viewing a chat, redirect to home
+			if ($chatId) {
+				goto('/');
+			}
+		});
+
 		audioQueue.set(new AudioQueue(document.getElementById('audioElement')));
 
 		pageSubscribe = page.subscribe(async (p) => {
@@ -644,6 +656,7 @@
 			chatIdUnsubscriber?.();
 			window.removeEventListener('message', onMessageHandler);
 			$socket?.off('events', chatEventHandler);
+			$socket?.off('chats-deleted');
 			$audioQueue?.destroy();
 		} catch (e) {
 			console.error(e);

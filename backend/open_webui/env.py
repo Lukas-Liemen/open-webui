@@ -73,7 +73,20 @@ except Exception:
 ####################################
 
 GLOBAL_LOG_LEVEL = os.environ.get("GLOBAL_LOG_LEVEL", "").upper()
-if GLOBAL_LOG_LEVEL in logging.getLevelNamesMapping():
+# Compatible with Python 3.10+
+try:
+    level_names = logging.getLevelNamesMapping()
+except AttributeError:
+    # Python 3.10 fallback
+    level_names = {
+        "CRITICAL": logging.CRITICAL,
+        "ERROR": logging.ERROR,
+        "WARNING": logging.WARNING,
+        "INFO": logging.INFO,
+        "DEBUG": logging.DEBUG,
+        "NOTSET": logging.NOTSET,
+    }
+if GLOBAL_LOG_LEVEL in level_names:
     logging.basicConfig(stream=sys.stdout, level=GLOBAL_LOG_LEVEL, force=True)
 else:
     GLOBAL_LOG_LEVEL = "INFO"
@@ -550,9 +563,7 @@ if LICENSE_PUBLIC_KEY:
 -----BEGIN PUBLIC KEY-----
 {LICENSE_PUBLIC_KEY}
 -----END PUBLIC KEY-----
-""".encode(
-            "utf-8"
-        )
+""".encode("utf-8")
     )
 
 

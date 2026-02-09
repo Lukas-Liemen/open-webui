@@ -178,6 +178,19 @@
 				console.log('Additional details:', details);
 			}
 		});
+
+		// Listen for chats-deleted event from admin
+		_socket.on('chats-deleted', async (data) => {
+			console.log('Received chats-deleted event:', data);
+			toast.info(i18n.t('All chats have been deleted by admin'));
+			// Refresh the chat list
+			const newChatList = await getChatList(localStorage.token);
+			chats.set(newChatList);
+			// If currently viewing a chat, redirect to home
+			if ($chatId) {
+				goto('/');
+			}
+		});
 	};
 
 	const executePythonAsWorker = async (id, code, cb) => {
