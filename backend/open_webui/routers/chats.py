@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 
 
 from open_webui.utils.misc import get_message_list
-from open_webui.socket.main import get_event_emitter
+from open_webui.socket.main import get_event_emitter, sio
 from open_webui.models.chats import (
     ChatForm,
     ChatImportForm,
@@ -536,7 +536,6 @@ async def delete_all_user_chats(
     user=Depends(get_verified_user),
     db: Session = Depends(get_session),
 ):
-
     if user.role == "user" and not has_permission(
         user.id, "chat.delete", request.app.state.config.USER_PERMISSIONS
     ):
@@ -547,6 +546,35 @@ async def delete_all_user_chats(
 
     result = Chats.delete_chats_by_user_id(user.id, db=db)
     return result
+
+
+############################
+# DeleteAllChats (Admin only)
+############################
+
+
+@router.delete("/all", response_model=bool)
+async def delete_all_chats_admin(
+    user=Depends(get_admin_user),
+    db: Session = Depends(get_session),
+):
+    """
+    Delete all chats from the database (admin only).
+    This removes all chat histories but preserves knowledge bases and other user data.
+    """
+    try:
+        result = Chats.delete_all_chats(db=db)
+        if result:
+            # Broadcast to all connected users that chats have been deleted
+            await sio.emit(
+                "chats-deleted", {"message": "All chats have been deleted by admin"}
+            )
+        return result
+    except Exception as e:
+        log.exception(e)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=ERROR_MESSAGES.DEFAULT()
+        )
 
 
 ############################
@@ -1222,7 +1250,6 @@ async def clone_chat_by_id(
 async def clone_shared_chat_by_id(
     id: str, user=Depends(get_verified_user), db: Session = Depends(get_session)
 ):
-
     if user.role == "admin":
         chat = Chats.get_chat_by_id(id, db=db)
     else:

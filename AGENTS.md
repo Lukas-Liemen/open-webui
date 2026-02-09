@@ -19,6 +19,7 @@
 - [Testing](#testing)
 - [Documentation](#documentation)
 - [Deployment](#deployment)
+- [Development](#development)
 
 ---
 
@@ -618,3 +619,91 @@ Build and utility scripts:
 11. **PWA Support**: Progressive Web App for mobile
 12. **Collaboration**: Channels and shared chats
 13. **Internationalization**: Multi-language support
+
+---
+
+## Development
+
+### Starting the Application
+
+To run Open WebUI locally for development, you need to start both the backend and frontend servers.
+
+#### Prerequisites
+
+- **Node.js** (v18+) and npm installed
+- **Python** (3.10+) installed
+- Backend dependencies installed in `backend/venv/`
+
+#### 1. Start the Backend Server
+
+Navigate to the backend directory and start the FastAPI server:
+
+```bash
+cd backend
+. venv/Scripts/activate  # On Windows
+# OR
+source venv/bin/activate  # On Linux/Mac
+
+python -m uvicorn open_webui.main:app --port 8080 --host 0.0.0.0
+```
+
+The backend will be available at `http://localhost:8080`
+
+To verify it's running:
+```bash
+curl http://localhost:8080/health
+# Should return: {"status":true}
+```
+
+**Note:** The first user to sign up automatically becomes the admin.
+
+#### 2. Start the Frontend Dev Server
+
+In a separate terminal, from the project root:
+
+```bash
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`
+
+#### 3. Access the Application
+
+1. Open your browser to `http://localhost:5173`
+2. Click **"Sign up"** to create the first admin account
+3. Log in with your credentials
+
+### Resetting the Database
+
+If you need to reset the database (e.g., to create a new admin account):
+
+```bash
+# Stop the backend server
+taskkill /F /IM python.exe  # Windows
+# OR
+pkill -f uvicorn  # Linux/Mac
+
+# Delete the database file
+rm backend/data/webui.db
+
+# Restart the backend
+```
+
+### Common Development Commands
+
+```bash
+# Install frontend dependencies
+npm install
+
+# Build frontend for production
+npm run build
+
+# Run frontend tests
+npm run test:frontend
+
+# Lint frontend code
+npm run lint:frontend
+
+# Format code
+npm run format
+```

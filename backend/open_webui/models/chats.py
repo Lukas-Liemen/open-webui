@@ -642,7 +642,6 @@ class ChatTable:
         limit: int = 50,
         db: Optional[Session] = None,
     ) -> list[ChatModel]:
-
         with get_db_context(db) as db:
             query = db.query(Chat).filter_by(user_id=user_id, archived=True)
 
@@ -1393,6 +1392,18 @@ class ChatTable:
                 db.query(Chat).filter(Chat.user_id.in_(shared_chat_ids)).delete()
                 db.commit()
 
+                return True
+        except Exception:
+            return False
+
+    def delete_all_chats(self, db: Optional[Session] = None) -> bool:
+        try:
+            with get_db_context(db) as db:
+                # Delete all shared chats first
+                db.query(Chat).filter(Chat.user_id.like("shared-%")).delete()
+                # Delete all regular chats
+                db.query(Chat).delete()
+                db.commit()
                 return True
         except Exception:
             return False

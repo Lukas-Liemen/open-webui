@@ -4,9 +4,9 @@
 
 	import { downloadDatabase } from '$lib/apis/utils';
 	import { onMount, getContext } from 'svelte';
-	import { config, user } from '$lib/stores';
+	import { config, user, chats } from '$lib/stores';
 	import { toast } from 'svelte-sonner';
-	import { getAllUserChats } from '$lib/apis/chats';
+	import { getAllUserChats, deleteAllChatsAdmin, getChatList } from '$lib/apis/chats';
 	import { getAllUsers } from '$lib/apis/users';
 	import { exportConfig, importConfig } from '$lib/apis/configs';
 
@@ -228,6 +228,48 @@
 					</div>
 					<div class=" self-center text-sm font-medium">
 						{$i18n.t('Export Users')}
+					</div>
+				</button>
+
+				<hr class="border-gray-50 dark:border-gray-850/30 my-1" />
+
+				<button
+					type="button"
+					class=" flex rounded-md py-2 px-3 w-full hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition"
+					on:click={async () => {
+						const confirmed = confirm(
+							$i18n.t(
+								'Are you sure you want to delete all chats? This action cannot be undone. User knowledge will be preserved.'
+							)
+						);
+						if (confirmed) {
+							const res = await deleteAllChatsAdmin(localStorage.token).catch((error) => {
+								toast.error(`${error}`);
+							});
+							if (res) {
+								toast.success($i18n.t('All chats deleted successfully'));
+								// Refresh the chat list for the admin user
+								await chats.set(await getChatList(localStorage.token));
+							}
+						}
+					}}
+				>
+					<div class=" self-center mr-3">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 16 16"
+							fill="currentColor"
+							class="w-4 h-4"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M5 3.25V4H2.75a.75.75 0 0 0 0 1.5h.3l.815 8.15A1.5 1.5 0 0 0 5.357 15h5.285a1.5 1.5 0 0 0 1.493-1.35l.815-8.15h.3a.75.75 0 0 0 0-1.5H11v-.75A2.25 2.25 0 0 0 8.75 1h-1.5A2.25 2.25 0 0 0 5 3.25Zm2.25-.75a.75.75 0 0 0-.75.75V4h3v-.75a.75.75 0 0 0-.75-.75h-1.5ZM8 6.5a.75.75 0 0 0-.75.75v5.5a.75.75 0 0 0 1.5 0v-5.5A.75.75 0 0 0 8 6.5Zm-3.25.75a.75.75 0 0 0-.75.75v5.5a.75.75 0 0 0 1.5 0v-5.5a.75.75 0 0 0-.75-.75Zm6.5.75a.75.75 0 0 0-.75.75v5.5a.75.75 0 0 0 1.5 0v-5.5a.75.75 0 0 0-.75-.75Z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</div>
+					<div class=" self-center text-sm font-medium">
+						{$i18n.t('Delete All Chats (Admin)')}
 					</div>
 				</button>
 			{/if}
