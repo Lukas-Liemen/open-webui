@@ -1,3 +1,5 @@
+> ⚠️ **FORK NOTICE**: This repository is a **fork** of the original [open-webui](https://github.com/open-webui/open-webui) project. This is NOT the official Open WebUI repository. For the official project, please visit [github.com/open-webui/open-webui](https://github.com/open-webui/open-webui).
+
 # Open WebUI 👋
 
 ![GitHub stars](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
