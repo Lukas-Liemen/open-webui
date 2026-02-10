@@ -636,30 +636,16 @@ To run Open WebUI locally for development, you need to start both the backend an
 
 #### 1. Start the Backend Server
 
-Navigate to the backend directory and start the FastAPI server:
+Start the FastAPI server:
 
 ```bash
-cd backend
-. venv/Scripts/activate  # On Windows
-# OR
-source venv/bin/activate  # On Linux/Mac
-
+conda activate open-webui
 python -m uvicorn open_webui.main:app --port 8080 --host 0.0.0.0
 ```
 
 The backend will be available at `http://localhost:8080`
 
-To verify it's running:
-```bash
-curl http://localhost:8080/health
-# Should return: {"status":true}
-```
-
-**Note:** The first user to sign up automatically becomes the admin.
-
 #### 2. Start the Frontend Dev Server
-
-In a separate terminal, from the project root:
 
 ```bash
 npm run dev
@@ -672,38 +658,3 @@ The frontend will be available at `http://localhost:5173`
 1. Open your browser to `http://localhost:5173`
 2. Click **"Sign up"** to create the first admin account
 3. Log in with your credentials
-
-### Resetting the Database
-
-If you need to reset the database (e.g., to create a new admin account):
-
-```bash
-# Stop the backend server
-taskkill /F /IM python.exe  # Windows
-# OR
-pkill -f uvicorn  # Linux/Mac
-
-# Delete the database file
-rm backend/data/webui.db
-
-# Restart the backend
-```
-
-### Common Development Commands
-
-```bash
-# Install frontend dependencies
-npm install
-
-# Build frontend for production
-npm run build
-
-# Run frontend tests
-npm run test:frontend
-
-# Lint frontend code
-npm run lint:frontend
-
-# Format code
-npm run format
-```
